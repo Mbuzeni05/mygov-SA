@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MyGov SA</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+    <div class="container">
+
+       
+        <header class="main-header">
+            <h1 class="logo">MyGov SA</h1>
+
+            <div class="user-info">
+                <span>Welcome, {{ user.username }} 👋</span>
+                <a href="{% url 'account_logout' %}" class="logout-link">
+                    Logout
+                </a>
+            </div>
+        </header>
+
+
+        
+        <main>
+
+            
+            <section class="dashboard-header">
+                <h2>Service Dashboard</h2>
+
+                <a href="{% url 'reports:report_issue' %}" class="btn-report">
+                    + Report New Issue
+                </a>
+            </section>
+
+
+           
+            <section class="status-summary">
+
+                
+                <div class="status-card received">
+                    <div class="status-count">{{ status_counts.received }}</div>
+                    <div class="status-label">Received</div>
+                </div>
+
+               
+                <div class="status-card assigned">
+                    <div class="status-count">{{ status_counts.assigned }}</div>
+                    <div class="status-label">Assigned</div>
+                </div>
+
+                
+                <div class="status-card in-progress">
+                    <div class="status-count">{{ status_counts.in_progress }}</div>
+                    <div class="status-label">In Progress</div>
+                </div>
+
+                
+                <div class="status-card resolved">
+                    <div class="status-count">{{ status_counts.resolved }}</div>
+                    <div class="status-label">Resolved</div>
+                </div>
+
+            </section>
+
+            <section class="reports-section">
+                <h3>Active Reports</h3>
+
+                {% for report in reports %}
+                    <div class="report-card status-{{ report.status }}">
+
+                       
+                        <div class="report-header">
+                            <span class="report-reference">
+                                {{ report.reference }}
+                            </span>
+
+                            <span class="report-status status-badge-{{ report.status_color }}">
+                                {{ report.status_display }}
+                            </span>
+                        </div>
+                       
+                        <div class="report-details">
+
+                            <p class="report-category">
+                                {{ report.category_display }} Issue
+                            </p>
+
+                            <p class="report-location">
+                                {{ report.location }}
+                            </p>
+
+                            <p class="report-description">
+                                {{ report.description|truncatewords:20 }}
+                            </p>
+
+                            {% if report.assigned_to %}
+                                <p class="report-assigned">
+                                    Assigned: {{ report.assigned_to }}
+                                </p>
+                            {% endif %}
+
+                            {% if report.estimated_completion %}
+                                <p class="report-estimate">
+                                    Estimated completion: {{ report.estimated_completion }}
+                                </p>
+                            {% endif %}
+
+                            <p class="report-date">
+                                 Reported: {{ report.date_reported }}
+                            </p>
+
+                            
+                            <a href="{% url 'tracking:track_by_reference' ref=report.reference %}" 
+                               class="btn-view">
+                                View Details →
+                            </a>
+
+                        </div>
+                    </div>
+
+                {% empty %}
+                    <p>
+                        No reports found.
+                        <a href="{% url 'reports:report_issue' %}">
+                            Report an issue
+                        </a>
+                        to get started.
+                    </p>
+                {% endfor %}
+            </section>
+
+
+            
+            <section class="track-section">
+                <h3>🔍 Track a Report</h3>
+
+                <form action="{% url 'tracking:track' %}" method="GET">
+                    <input 
+                        type="text" 
+                        name="reference" 
+                        placeholder="Enter reference (e.g., SR-20260326-A1B2C3)" 
+                        required
+                    >
+
+                    <button type="submit" class="btn-secondary">
+                        Track Report
+                    </button>
+                </form>
+            </section>
+
+        </main>
+
+
+        
+        <footer class="main-footer">
+            <p>MyGov SA - Your partner in service delivery</p>
+            <p class="footer-note">
+                SMS updates are sent to registered phone numbers
+            </p>
+        </footer>
+
+    </div>
+</body>
+</html>
